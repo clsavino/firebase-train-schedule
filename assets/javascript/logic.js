@@ -29,12 +29,6 @@ $("#addTrainBtn").on("click", function(event){
 	// Uploads employee data to the database
 	database.ref().push(newTrain);
 
-	// Logs everything to console
-	console.log(newTrain.name);
-	console.log(newTrain.destination);
-	console.log(newTrain.time);
-	console.log(newTrain.frequency);
-
 	// Clears all of the text-boxes
 	$("#trainNameInput").val("");
 	$("#destinationInput").val("");
@@ -47,21 +41,15 @@ $("#addTrainBtn").on("click", function(event){
 
 
 // Create Firebase event for adding a train to the database and a row in the html table when a user adds an entry
-database.ref().on("child_added", function(childSnapshot, prevChildKey){
+database.ref().on("child_added", function(childSnapshot){
 
-	console.log(childSnapshot.val());
+	//console.log(childSnapshot.val());
 
 	// Store everything into a variable.
 	var trainName = childSnapshot.val().name;
 	var trainDestination = childSnapshot.val().destination;
 	var firstTrainTime = childSnapshot.val().time;
 	var trainFrequency= childSnapshot.val().frequency;
-
-	// Train Info
-	console.log(trainName);
-	console.log(trainDestination);
-	console.log(firstTrainTime);
-	console.log(trainFrequency);
 
 	// format the train time, subtract 1 year to make sure it comes before current time
 	var firstTimeConverted = moment.unix(firstTrainTime, 'hh:mm').subtract(1,'years');
@@ -71,18 +59,14 @@ database.ref().on("child_added", function(childSnapshot, prevChildKey){
 
 	// difference between current time and converted time
 	var diffTime = moment().diff(moment(firstTimeConverted), 'minutes');
-	console.log('difference in minutes ', diffTime);
 
 	//calculate time apart ( the frequency - remainder)
 	//mins till train
 	var remainder = diffTime % trainFrequency;
-	console.log('remainder of % ', remainder);
 
 	var minsAway = trainFrequency - remainder;
-	console.log('minsAway', minsAway);
 
 	var nextArrival = moment().add(minsAway, 'minutes').format("HH:mm");
-	console.log("ARRIVAL TIME: " + moment(nextArrival).format("HH:mm"));
 	
 	// Add each train's data into the table
 	$("#trainTable > tbody").append("<tr><td>" + trainName + "</td><td>" + trainDestination + "</td><td>" + trainFrequency + "</td><td>" + nextArrival + "</td><td>" + minsAway + "</td></tr>");
